@@ -2,6 +2,7 @@ import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/Layout";
 import Select from "react-select";
 import { withAdmin } from "@/utils/withAdmin";
+import { useRouter } from "next/router";
 
 export const getServerSideProps = withAdmin(CreateProductSideProps);
 
@@ -17,48 +18,63 @@ export async function CreateProductSideProps() {
 }
 
 export default function CreateProduct({ categories }) {
+  const router = useRouter();
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [stock, setStock] = useState(0);
   const [price, setPrice] = useState(0);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [images, setImages] = useState([]);
+  const [previews, setPreviews] = useState([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState(false);
 
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setImages(selectedFiles);
+    setPreviews(selectedFiles.map((file) => URL.createObjectURL(file)));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const categories = selectedCategories.map((category) => category.value);
 
     setIsSubmitting(true);
     setErrors(null);
     setSuccess(false);
 
     try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("stock", stock);
+      formData.append("price", price);
+
+      selectedCategories.forEach((category) => {
+        formData.append("categories", category.value);
+      });
+
+      images.forEach((images) => {
+        formData.append("images", images);
+      });
+
       const response = await fetch(`${API_URL}/api/products/store`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          description,
-          stock,
-          price,
-          categories,
-        }),
+        body: formData,
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        console.log(data);
         setErrors(data.errors);
+        throw new Error("Something went wrong.");
       }
+
+      router.push("/dashboard/products");
     } catch (err) {
-      setErrors(err);
+      console.log(err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -108,6 +124,21 @@ export default function CreateProduct({ categories }) {
           <Select options={categories} isMulti={true} onChange={setSelectedCategories} />
           {errors?.categories && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.categories}</p>}
         </div>
+
+        <div className="mb-5">
+          <label htmlFor="images" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            Product images
+          </label>
+          <input id="images" type="file" multiple onChange={handleFileChange} className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" />
+        </div>
+
+        {previews && (
+          <div className="mb-3 flex gap-3">
+            {previews.map((preview, idx) => (
+              <img key={idx} src={preview} alt="Preview" style={{ width: "100px" }} />
+            ))}
+          </div>
+        )}
 
         <button
           type="submit"

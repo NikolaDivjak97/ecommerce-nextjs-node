@@ -1,41 +1,31 @@
-export default function Table({
-  columns,
-  data,
-  currentPage,
-  pageSize,
-  total,
-  onPageChange,
-  onPageSizeChange,
-}) {
+import { useRouter } from "next/router";
+
+export default function Table({ columns, data, currentPage, pageSize, total, onPageChange, onPageSizeChange }) {
+  const router = useRouter();
   const totalPages = Math.ceil(total / pageSize);
+
+  const editRow = (rowId) => {
+    router.push("/test/" + rowId);
+  };
 
   return (
     <div>
-      <div className="overflow-x-auto rounded-lg shadow-lg">
-        <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-          <thead className="bg-gray-100">
+      <div>
+        <table className="min-w-full">
+          <thead className="bg-gray-800 text-white">
             <tr>
               {columns.map((column) => (
-                <th
-                  key={column}
-                  className="py-3 px-5 border-b border-gray-300 text-left text-gray-700 font-semibold"
-                >
+                <th key={column} className="px-6 py-3 text-left text-sm font-semibold uppercase">
                   {column}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-200">
             {data.map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className="even:bg-gray-50 hover:bg-gray-100 transition-all"
-              >
+              <tr key={rowIndex} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => editRow(row.id)}>
                 {columns.map((column) => (
-                  <td
-                    key={column}
-                    className="py-3 px-5 border-b border-gray-300 text-gray-800"
-                  >
+                  <td key={column} className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {row[column]}
                   </td>
                 ))}
@@ -47,15 +37,10 @@ export default function Table({
 
       <div className="flex justify-between items-center mt-4">
         <div>
-          <label htmlFor="pageSize" className="mr-2 text-gray-600">
+          <label htmlFor="pageSize" className="mr-2 text-sm text-gray-600">
             Rows per page:
           </label>
-          <select
-            id="pageSize"
-            value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className="border rounded-md p-1 text-gray-700"
-          >
+          <select id="pageSize" value={pageSize} onChange={(e) => onPageSizeChange(Number(e.target.value))} className="border border-gray-300 rounded-md p-1 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
             {[10, 25, 50, 100].map((size) => (
               <option key={size} value={size}>
                 {size}
@@ -65,21 +50,13 @@ export default function Table({
         </div>
 
         <div className="flex items-center space-x-2">
-          <button
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-300 rounded-md text-gray-700 hover:bg-gray-400 disabled:bg-gray-200"
-          >
+          <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
             Prev
           </button>
-          <span className="text-gray-700">
+          <span className="text-sm text-gray-700">
             Page {currentPage} of {totalPages}
           </span>
-          <button
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-300 rounded-md text-gray-700 hover:bg-gray-400 disabled:bg-gray-200"
-          >
+          <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
             Next
           </button>
         </div>

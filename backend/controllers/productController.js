@@ -1,4 +1,4 @@
-const { Product } = require("../models");
+const { Product, Image } = require("../models");
 const slugify = require("slugify");
 
 const getProducts = async (req, res) => {
@@ -29,9 +29,20 @@ const storeProduct = async (req, res) => {
   try {
     const { name, description, stock, price, categories } = req.body;
     const slug = slugify(name, { lower: true, strict: true });
+
     const product = await Product.create({ name, slug, description, stock, price });
 
     await product.setCategories(categories);
+
+    if (req.files && req.files.length > 0) {
+      const images = req.files.map((file) => ({
+        productId: product.id,
+        name: file.filename,
+        path: `/uploads/${file.filename}`,
+      }));
+
+      await Image.bulkCreate(images);
+    }
 
     res.status(201).json({ message: "Product created successfully" });
   } catch (error) {
@@ -46,13 +57,15 @@ const table = async (req, res) => {
 
     const offset = (page - 1) * pageSize;
 
+    const columns = ["id", "slug", "name", "price", "stock"];
+
     const products = await Product.findAll({
       limit: pageSize,
       offset: offset,
+      attributes: columns,
     });
 
     const total = await Product.count();
-    const columns = Object.keys(Product.rawAttributes);
 
     res.json({ products, columns, total });
   } catch (error) {
