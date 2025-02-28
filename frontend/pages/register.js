@@ -25,7 +25,7 @@ export default function Register() {
 
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      sessionStorage.setItem("token", data.token);
+      document.cookie = `token=${data.token}; path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=86400`;
 
       router.push("/");
     } catch (err) {
@@ -38,27 +38,9 @@ export default function Register() {
       <form onSubmit={handleRegister} className="bg-gray-800 p-6 rounded shadow-lg w-96">
         <h2 className="text-white text-xl mb-4">Register</h2>
         {error && <p className="text-red-500">{error}</p>}
-        <input
-          type="text"
-          placeholder="Name"
-          className="w-full p-2 mb-2"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full p-2 mb-2"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full p-2 mb-2"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <input type="text" placeholder="Name" className="w-full p-2 mb-2" value={name} onChange={(e) => setName(e.target.value)} />
+        <input type="email" placeholder="Email" className="w-full p-2 mb-2" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="password" placeholder="Password" className="w-full p-2 mb-2" value={password} onChange={(e) => setPassword(e.target.value)} />
         <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded w-full">
           Register
         </button>

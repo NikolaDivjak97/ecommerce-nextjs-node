@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/authContext";
+import { deleteToken } from "@/utils/auth";
 
 export default function Navbar() {
   const { user, setUser } = useAuth();
   const router = useRouter();
 
   const handleLogout = () => {
-    sessionStorage.removeItem("token");
+    deleteToken();
     setUser(null);
     router.push("/");
   };
@@ -22,22 +23,13 @@ export default function Navbar() {
         <div className="relative group">
           <button className="hover:underline">Categories</button>
           <div className="absolute hidden group-hover:block bg-gray-800 text-white mt-2 rounded shadow-lg">
-            <Link
-              href="/category/electronics"
-              className="block px-4 py-2 hover:bg-gray-700"
-            >
+            <Link href="/category/electronics" className="block px-4 py-2 hover:bg-gray-700">
               Electronics
             </Link>
-            <Link
-              href="/category/clothing"
-              className="block px-4 py-2 hover:bg-gray-700"
-            >
+            <Link href="/category/clothing" className="block px-4 py-2 hover:bg-gray-700">
               Clothing
             </Link>
-            <Link
-              href="/category/books"
-              className="block px-4 py-2 hover:bg-gray-700"
-            >
+            <Link href="/category/books" className="block px-4 py-2 hover:bg-gray-700">
               Books
             </Link>
           </div>
@@ -55,10 +47,7 @@ export default function Navbar() {
                     Dashboard
                   </Link>
                 )}
-                <Link
-                  href="/orders"
-                  className="block px-4 py-2 hover:bg-gray-700"
-                >
+                <Link href="/orders" className="block px-4 py-2 hover:bg-gray-700">
                   My orders
                 </Link>
               </div>

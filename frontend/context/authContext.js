@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getUser } from "@/utils/auth";
+import { getUserFromClient } from "@/utils/auth";
 
 const AuthContext = createContext();
 
@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const data = await getUser();
+      const data = await getUserFromClient();
 
       if (data && data.user) {
         setUser(data.user);
@@ -18,11 +18,7 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, setUser }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, setUser }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);
