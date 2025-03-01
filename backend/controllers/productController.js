@@ -1,4 +1,5 @@
-const { Product, Image } = require("../models");
+const { Product, Image, Category, sequelize } = require("../models");
+const categoryController = require("../controllers/categoryController");
 const slugify = require("slugify");
 
 const getProducts = async (req, res) => {
@@ -25,6 +26,40 @@ const getProduct = async (req, res) => {
   }
 };
 
+const editProduct = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    res.status(500).json({ error: "Id parameter missing!" });
+  }
+
+  try {
+    const product = await Product.findByPk(id, {
+      include: [
+        {
+          model: Image,
+          as: "images",
+          attributes: ["id", "path"],
+        },
+        {
+          model: Category,
+          as: "Categories",
+          through: { attributes: [] },
+          attributes: ["id", "name"],
+        },
+      ],
+    });
+
+    const categories = await sequelize.query("SELECT id AS value, name AS label FROM categories", { type: sequelize.QueryTypes.SELECT });
+
+    // const categories = await Category.findAll({ attributes: ["id", "name"] });
+
+    res.json({ product, categories });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const storeProduct = async (req, res) => {
   try {
     const { name, description, stock, price, categories } = req.body;
@@ -38,7 +73,7 @@ const storeProduct = async (req, res) => {
       const images = req.files.map((file) => ({
         productId: product.id,
         name: file.filename,
-        path: `/uploads/${file.filename}`,
+        path: `/images/${file.filename}`,
       }));
 
       await Image.bulkCreate(images);
@@ -73,4 +108,4 @@ const table = async (req, res) => {
   }
 };
 
-module.exports = { getProducts, getProduct, storeProduct, table };
+module.exports = { getProducts, getProduct, editProduct, storeProduct, table };

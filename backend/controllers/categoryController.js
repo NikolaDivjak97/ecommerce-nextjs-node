@@ -10,8 +10,6 @@ const getCategories = async (req, res) => {
 };
 
 const getCategoriesSelect = async (req, res) => {
-  console.log("authh", req.headers.authorization);
-
   try {
     const categories = await sequelize.query("SELECT id AS value, name AS label FROM categories", { type: sequelize.QueryTypes.SELECT });
 
