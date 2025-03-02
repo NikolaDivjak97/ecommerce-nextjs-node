@@ -1,5 +1,4 @@
 const { Product, Image, Category, sequelize } = require("../models");
-const categoryController = require("../controllers/categoryController");
 const slugify = require("slugify");
 
 const getProducts = async (req, res) => {
@@ -30,7 +29,7 @@ const editProduct = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    res.status(500).json({ error: "Id parameter missing!" });
+    return res.status(500).json({ error: "Id parameter missing!" });
   }
 
   try {
@@ -50,9 +49,11 @@ const editProduct = async (req, res) => {
       ],
     });
 
-    const categories = await sequelize.query("SELECT id AS value, name AS label FROM categories", { type: sequelize.QueryTypes.SELECT });
+    if (!product) {
+      return res.status(500).json({ error: "Product not found!" });
+    }
 
-    // const categories = await Category.findAll({ attributes: ["id", "name"] });
+    const categories = await sequelize.query("SELECT id AS value, name AS label FROM categories", { type: sequelize.QueryTypes.SELECT });
 
     res.json({ product, categories });
   } catch (error) {
@@ -85,6 +86,54 @@ const storeProduct = async (req, res) => {
   }
 };
 
+const updateProduct = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(500).json({ error: "Id parameter missing!" });
+  }
+
+  try {
+    const product = await Product.findByPk(id);
+    const { name, description, stock, price, categories } = req.body;
+    const slug = slugify(name, { lower: true, strict: true });
+
+    product.update({ name, slug, description, stock, price });
+
+    await product.setCategories(categories);
+
+    res.status(201).json({ message: "Product updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteProduct = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(500).json({ error: "Id parameter missing!" });
+  }
+
+  try {
+    const product = await Product.findByPk(id);
+
+    if (!product) {
+      return res.status(500).json({ error: "Product not found!" });
+    }
+
+    const deleted = await product.destroy();
+
+    if (!deleted) {
+      throw new Error("An error occurred.");
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const table = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -108,4 +157,4 @@ const table = async (req, res) => {
   }
 };
 
-module.exports = { getProducts, getProduct, editProduct, storeProduct, table };
+module.exports = { getProducts, getProduct, editProduct, storeProduct, updateProduct, deleteProduct, table };
