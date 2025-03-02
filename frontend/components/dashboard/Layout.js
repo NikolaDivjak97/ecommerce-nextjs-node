@@ -1,19 +1,29 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { useAuth } from "@/context/authContext";
 import { FiHome, FiBox, FiUsers, FiShoppingCart, FiLogOut } from "react-icons/fi";
 import { BiCategoryAlt } from "react-icons/bi";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function DashboardLayout({ children }) {
+  const { user, setUser } = useAuth();
+
   const router = useRouter();
 
-  const handleLogout = () => {
-    deleteToken();
+  const handleLogout = async () => {
+    await fetch(`${API_URL}/api/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+
     setUser(null);
+
     router.push("/");
   };
 
   return (
-    <div className="flex bg-gray-100 h-full">
+    <div className="flex bg-gray-100 h-full min-h-screen">
       <aside className={`w-64 bg-white shadow-md transition-transform translate-x-0 md:translate-x-0 fixed md:relative z-10 h-100`}>
         <div className="p-4 text-xl font-bold border-b">Admin Panel</div>
         <nav className="mt-4">

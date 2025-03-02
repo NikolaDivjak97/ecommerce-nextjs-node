@@ -1,15 +1,21 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/authContext";
-import { deleteToken } from "@/utils/auth";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Navbar() {
   const { user, setUser } = useAuth();
   const router = useRouter();
 
-  const handleLogout = () => {
-    deleteToken();
+  const handleLogout = async () => {
+    await fetch(`${API_URL}/api/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+
     setUser(null);
+
     router.push("/");
   };
 

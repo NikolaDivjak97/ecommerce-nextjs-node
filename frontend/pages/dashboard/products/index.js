@@ -3,25 +3,26 @@ import Table from "@/components/common/Table";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { FiPlus } from "react-icons/fi";
-
 import { withAdmin } from "@/utils/withAdmin";
-
-export const getServerSideProps = withAdmin(ProductsSideProps);
+import { ToastContainer, toast } from "react-toastify";
+import { useEffect } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+export const getServerSideProps = withAdmin(ProductsSideProps);
+
 export async function ProductsSideProps({ query }) {
-  const { page = 1, pageSize = 10 } = query;
+  const { page = 1, pageSize = 10, message = null } = query;
 
   const res = await fetch(`${API_URL}/api/products/table?page=${page}&pageSize=${pageSize}`);
   const products = await res.json();
 
   return {
-    props: { products, page: parseInt(page), pageSize: parseInt(pageSize) },
+    props: { products, page: parseInt(page), pageSize: parseInt(pageSize), message },
   };
 }
 
-export default function Products({ products, page, pageSize }) {
+export default function Products({ products, page, pageSize, message }) {
   const router = useRouter();
 
   const handlePageChange = (newPage) => {
@@ -38,6 +39,18 @@ export default function Products({ products, page, pageSize }) {
     });
   };
 
+  useEffect(() => {
+    const showToastMessage = () => {
+      if (message) {
+        toast.success(message, {
+          position: "top-right",
+        });
+      }
+    };
+
+    showToastMessage();
+  }, []);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -47,7 +60,8 @@ export default function Products({ products, page, pageSize }) {
         </Link>
       </div>
 
-      <Table columns={products.columns} data={products.products} currentPage={page} pageSize={pageSize} total={products.total} onPageChange={handlePageChange} onPageSizeChange={handlePageSizeChange} />
+      <Table columns={products.columns} data={products.products} editRoute={"/dashboard/products/edit"} currentPage={page} pageSize={pageSize} total={products.total} onPageChange={handlePageChange} onPageSizeChange={handlePageSizeChange} />
+      <ToastContainer />
     </div>
   );
 }

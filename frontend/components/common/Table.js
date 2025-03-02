@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
 
-export default function Table({ columns, data, currentPage, pageSize, total, onPageChange, onPageSizeChange }) {
+export default function Table({ columns, data, currentPage, pageSize, total, onPageChange, onPageSizeChange, editRoute }) {
   const router = useRouter();
   const totalPages = Math.ceil(total / pageSize);
 
   const editRow = (rowId) => {
-    router.push("/test/" + rowId);
+    router.push(`${editRoute}/${rowId}`);
   };
 
   return (

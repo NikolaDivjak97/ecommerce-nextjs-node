@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { getUserFromClient } from "@/utils/auth";
+import { useAuth } from "../context/authContext";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -10,6 +12,8 @@ export default function Register() {
   const [error, setError] = useState(null);
   const router = useRouter();
 
+  const { user, setUser } = useAuth();
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError(null);
@@ -18,6 +22,7 @@ export default function Register() {
       const res = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ name, email, password }),
       });
 
@@ -25,7 +30,12 @@ export default function Register() {
 
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      document.cookie = `token=${data.token}; path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=86400`;
+      const userData = await getUserFromClient();
+      const user = userData.user;
+
+      if (user) {
+        setUser(user);
+      }
 
       router.push("/");
     } catch (err) {

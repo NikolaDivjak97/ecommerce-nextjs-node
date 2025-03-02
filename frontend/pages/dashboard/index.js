@@ -7,7 +7,7 @@ export default function Dashboard({ user }) {
   return (
     <div>
       <h1 className="text-2xl font-bold">Dashboard Overview</h1>
-      <p>Welcome to the admin panel! {user.name}</p>
+      <p>Welcome to the admin panel! {user?.name}</p>
     </div>
   );
 }

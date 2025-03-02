@@ -2,7 +2,7 @@ import { getUser } from "@/utils/auth";
 
 export function withAdmin(pageGetServerSideProps) {
   return async (context) => {
-    const userData = await getUser(context.req);
+    const userData = await getUser(context);
     const user = userData?.user;
 
     if (!user || !user.isAdmin) {

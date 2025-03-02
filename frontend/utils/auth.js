@@ -1,15 +1,8 @@
 const cookie = require("cookie");
 
 export async function getUserFromClient() {
-  const token = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("token="))
-    ?.split("=")[1];
-
-  if (!token) return null;
-
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: "include",
   });
 
   if (!res.ok) {
@@ -19,15 +12,12 @@ export async function getUserFromClient() {
   return await res.json();
 }
 
-export async function getUser(req) {
-  if (!req || !req.headers || !req.headers.cookie) return null;
-
-  const cookies = cookie.parse(req.headers.cookie);
-  const token = cookies.token;
-
+export async function getUser(context) {
   try {
+    const { req } = context;
+
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Cookie: req.headers.cookie || "" },
     });
 
     if (!res.ok) throw new Error("Not authenticated");

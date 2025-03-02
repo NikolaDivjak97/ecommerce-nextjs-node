@@ -56,8 +56,8 @@ export default function CreateProduct({ categories }) {
         formData.append("categories", category.value);
       });
 
-      images.forEach((images) => {
-        formData.append("images", images);
+      images.forEach((image) => {
+        formData.append("images", image);
       });
 
       const response = await fetch(`${API_URL}/api/products/store`, {
@@ -72,7 +72,10 @@ export default function CreateProduct({ categories }) {
         throw new Error("Something went wrong.");
       }
 
-      router.push("/dashboard/products");
+      router.push({
+        pathname: "/dashboard/products",
+        query: { message: "Product created successfully." },
+      });
     } catch (err) {
       console.log(err.message);
     } finally {
@@ -81,44 +84,43 @@ export default function CreateProduct({ categories }) {
   };
 
   return (
-    <div>
+    <div className="p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-2xl mb-5">New product</h1>
-      {success && <p style={{ color: "green" }}>Product created successfully!</p>}
       <form onSubmit={handleSubmit} className="w-100 mx-auto">
         <div className="mb-5">
-          <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
             Name
           </label>
-          <input type="text" id="name" onChange={(e) => setName(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+          <input type="text" id="name" onChange={(e) => setName(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
           {errors?.name && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.name}</p>}
         </div>
 
         <div className="mb-5">
-          <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
             Description
           </label>
-          <textarea id="description" rows="5" onChange={(e) => setDescription(e.target.value)} className="block p-2.5 w-full resize-none text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></textarea>
+          <textarea id="description" rows="5" onChange={(e) => setDescription(e.target.value)} className="mt-1 block w-full resize-none px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
           {errors?.description && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.description}</p>}
         </div>
 
         <div className="mb-5">
-          <label htmlFor="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
             Price
           </label>
-          <input type="number" id="price" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+          <input type="number" id="price" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
           {errors?.price && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.price}</p>}
         </div>
 
         <div className="mb-5">
-          <label htmlFor="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
             Stock
           </label>
-          <input type="number" id="stock" value={stock} onChange={(e) => setStock(e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+          <input type="number" id="stock" value={stock} onChange={(e) => setStock(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
           {errors?.stock && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.stock}</p>}
         </div>
 
         <div className="mb-5">
-          <label htmlFor="categories" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          <label htmlFor="categories" className="block text-sm font-medium text-gray-700">
             Categories
           </label>
           <Select options={categories} isMulti={true} onChange={setSelectedCategories} />
@@ -126,10 +128,10 @@ export default function CreateProduct({ categories }) {
         </div>
 
         <div className="mb-5">
-          <label htmlFor="images" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          <label htmlFor="images" class="block text-sm font-medium text-gray-700">
             Product images
           </label>
-          <input id="images" type="file" multiple onChange={handleFileChange} className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" />
+          <input id="images" type="file" multiple onChange={handleFileChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
         </div>
 
         {previews && (
