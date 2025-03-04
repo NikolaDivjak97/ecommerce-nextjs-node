@@ -11,10 +11,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const getServerSideProps = withAdmin(ProductsSideProps);
 
-export async function ProductsSideProps({ query }) {
+export async function ProductsSideProps({ req, query }) {
   const { page = 1, pageSize = 10, message = null } = query;
 
-  const res = await fetch(`${API_URL}/api/products/table?page=${page}&pageSize=${pageSize}`);
+  const res = await fetch(`${API_URL}/api/products/table?page=${page}&pageSize=${pageSize}`, {
+    headers: { Cookie: req.headers.cookie || "" },
+  });
   const products = await res.json();
 
   return {

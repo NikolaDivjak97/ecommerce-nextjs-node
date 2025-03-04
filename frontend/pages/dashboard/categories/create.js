@@ -3,36 +3,18 @@ import DashboardLayout from "@/components/dashboard/Layout";
 import { withAdmin } from "@/utils/withAdmin";
 import { useRouter } from "next/router";
 
-export const getServerSideProps = withAdmin(CreateCategorySideProps);
+export const getServerSideProps = withAdmin();
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function CreateCategorySideProps() {
-  const res = await fetch(`${API_URL}/api/categories/select`);
-  const categories = await res.json();
-
-  return {
-    props: { categories },
-  };
-}
-
-export default function CreateCategory({ categories }) {
+export default function CreateCategory() {
   const router = useRouter();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  //   const [images, setImages] = useState([]);
-  //   const [previews, setPreviews] = useState([]);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState(false);
-
-  //   const handleFileChange = (e) => {
-  //     const selectedFiles = Array.from(e.target.files);
-  //     setImages(selectedFiles);
-  //     setPreviews(selectedFiles.map((file) => URL.createObjectURL(file)));
-  //   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,23 +24,10 @@ export default function CreateCategory({ categories }) {
     setSuccess(false);
 
     try {
-      //   const formData = new FormData();
-      //   formData.append("name", name);
-      //   formData.append("description", description);
-      //   formData.append("stock", stock);
-      //   formData.append("price", price);
-
-      //   selectedCategories.forEach((category) => {
-      //     formData.append("categories", category.value);
-      //   });
-
-      //   images.forEach((images) => {
-      //     formData.append("images", images);
-      //   });
-
       const response = await fetch(`${API_URL}/api/categories/store`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ name, description }),
       });
 
@@ -69,7 +38,10 @@ export default function CreateCategory({ categories }) {
         throw new Error("Something went wrong.");
       }
 
-      router.push("/dashboard/categories");
+      router.push({
+        pathname: "/dashboard/categories",
+        query: { message: "Category created successfully." },
+      });
     } catch (err) {
       console.log(err.message);
     } finally {
@@ -80,7 +52,6 @@ export default function CreateCategory({ categories }) {
   return (
     <div className="p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-2xl mb-5">New category</h1>
-      {success && <p style={{ color: "green" }}>Category created successfully!</p>}
       <form onSubmit={handleSubmit} className="w-100 mx-auto">
         <div className="mb-5">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">

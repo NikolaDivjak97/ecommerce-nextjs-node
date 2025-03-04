@@ -8,6 +8,7 @@ const routes = require("./routes/routes");
 const app = express();
 
 app.use("/images", express.static(path.join(__dirname, "images")));
+app.use(cookieParser());
 
 app.use(
   cors({
@@ -15,7 +16,6 @@ app.use(
     credentials: true,
   })
 );
-app.use(cookieParser());
 
 app.use((req, res, next) => {
   if (req.headers["content-type"] && req.headers["content-type"].startsWith("application/json")) {

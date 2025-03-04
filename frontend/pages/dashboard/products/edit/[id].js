@@ -14,7 +14,9 @@ export const getServerSideProps = withAdmin(editProductSideProps);
 export async function editProductSideProps(context) {
   const { id } = context.params;
 
-  const res = await fetch(`${API_URL}/api/products/edit/${id}`);
+  const res = await fetch(`${API_URL}/api/products/edit/${id}`, {
+    headers: { Cookie: context.req.headers.cookie || "" },
+  });
   const { product, categories } = await res.json();
 
   return {
@@ -110,6 +112,7 @@ export default function EditProduct({ product, categories }) {
       formData.append("image", image);
 
       const response = await fetch(`${API_URL}/api/images/store`, {
+        credentials: "include",
         method: "POST",
         body: formData,
       });

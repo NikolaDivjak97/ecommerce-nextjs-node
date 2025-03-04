@@ -1,5 +1,8 @@
 "use strict";
+const fs = require("fs");
+const path = require("path");
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class Image extends Model {
     static associate(models) {
@@ -20,5 +23,14 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "Image",
     }
   );
+
+  Image.beforeDestroy(async (image) => {
+    const imagePath = path.join(process.cwd(), image.path);
+    console.log("PATH", imagePath);
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+  });
+
   return Image;
 };

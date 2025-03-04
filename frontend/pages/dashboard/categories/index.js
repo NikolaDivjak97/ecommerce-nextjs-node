@@ -2,23 +2,29 @@ import DashboardLayout from "@/components/dashboard/Layout";
 import Table from "@/components/common/Table";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { useEffect } from "react";
 import { FiPlus } from "react-icons/fi";
 import { withAdmin } from "@/utils/withAdmin";
+import { ToastContainer, toast } from "react-toastify";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const getServerSideProps = withAdmin(CategoriesSideProps);
 
-export async function CategoriesSideProps({ query }) {
-  const { page = 1, pageSize = 10 } = query;
-  const res = await fetch(`${API_URL}/api/categories/table?page=${page}&pageSize=${pageSize}`);
+export async function CategoriesSideProps({ req, query }) {
+  const { page = 1, pageSize = 10, message = null } = query;
+  const res = await fetch(`${API_URL}/api/categories/table?page=${page}&pageSize=${pageSize}`, {
+    headers: { Cookie: req.headers.cookie || "" },
+  });
+
   const categories = await res.json();
+
   return {
-    props: { categories, page: parseInt(page), pageSize: parseInt(pageSize) },
+    props: { categories, page: parseInt(page), pageSize: parseInt(pageSize), message },
   };
 }
 
-export default function Categories({ categories, page, pageSize }) {
+export default function Categories({ categories, page, pageSize, message }) {
   const router = useRouter();
 
   const handlePageChange = (newPage) => {
@@ -35,6 +41,18 @@ export default function Categories({ categories, page, pageSize }) {
     });
   };
 
+  useEffect(() => {
+    const showToastMessage = () => {
+      if (message) {
+        toast.success(message, {
+          position: "top-right",
+        });
+      }
+    };
+
+    showToastMessage();
+  }, []);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -45,6 +63,7 @@ export default function Categories({ categories, page, pageSize }) {
       </div>
 
       <Table columns={categories.columns} data={categories.categories} editRoute={"/dashboard/categories/edit"} currentPage={page} pageSize={pageSize} total={categories.total} onPageChange={handlePageChange} onPageSizeChange={handlePageSizeChange} />
+      <ToastContainer />
     </div>
   );
 }

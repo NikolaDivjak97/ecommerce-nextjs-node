@@ -10,15 +10,79 @@ const getCategories = async (req, res) => {
   }
 };
 
+const getCategory = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(500).json({ error: "Id parameter missing!" });
+  }
+
+  try {
+    const category = await Category.findByPk(id);
+
+    if (!category) {
+      return res.status(500).json({ error: "Category not found!" });
+    }
+    res.json({ category });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch category" });
+  }
+};
+
 const storeCategory = async (req, res) => {
   try {
-    console.log(req);
     const { name, description } = req.body;
     const slug = slugify(name, { lower: true, strict: true });
 
     const category = await Category.create({ name, slug, description });
 
     res.status(201).json({ message: "Category created successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const updateCategory = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(500).json({ error: "Id parameter missing!" });
+  }
+
+  try {
+    const category = await Category.findByPk(id);
+    const { name, description } = req.body;
+    const slug = slugify(name, { lower: true, strict: true });
+
+    category.update({ name, slug, description });
+
+    res.status(201).json({ message: "Category updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteCategory = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(500).json({ error: "Id parameter missing!" });
+  }
+
+  try {
+    const category = await Category.findByPk(id);
+
+    if (!category) {
+      return res.status(500).json({ error: "Category not found!" });
+    }
+
+    const deleted = await category.destroy();
+
+    if (!deleted) {
+      throw new Error("An error occurred.");
+    }
+
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -57,4 +121,4 @@ const table = async (req, res) => {
   }
 };
 
-module.exports = { getCategories, getCategoriesSelect, storeCategory, table };
+module.exports = { getCategories, getCategory, getCategoriesSelect, storeCategory, updateCategory, deleteCategory, table };

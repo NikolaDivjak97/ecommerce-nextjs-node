@@ -3,8 +3,6 @@ const authRoutes = require("./authRoutes");
 const productRoutes = require("./productRoutes");
 const categoryRoutes = require("./categoryRoutes");
 const imageRoutes = require("./imageRoutes");
-const { protect } = require("../middleware/authMiddleware");
-
 const router = express.Router();
 
 // Auth

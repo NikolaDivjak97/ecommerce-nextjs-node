@@ -18,6 +18,13 @@ export function withAdmin(pageGetServerSideProps) {
 
     if (pageGetServerSideProps) {
       const result = await pageGetServerSideProps(context);
+
+      if (result.redirect) {
+        return {
+          redirect: result.redirect,
+        };
+      }
+
       if (result.props) {
         props = result.props;
       }

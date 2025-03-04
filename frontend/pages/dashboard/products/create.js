@@ -61,6 +61,7 @@ export default function CreateProduct({ categories }) {
       });
 
       const response = await fetch(`${API_URL}/api/products/store`, {
+        credentials: "include",
         method: "POST",
         body: formData,
       });

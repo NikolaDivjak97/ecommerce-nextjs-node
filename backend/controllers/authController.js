@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const { User } = require("../models");
 
 const generateToken = (id) => {
-  console.log(process.env.JWT_SECRET);
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 };
 
@@ -25,8 +24,8 @@ const register = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "Strict",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -53,8 +52,8 @@ const login = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "Strict",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -67,8 +66,8 @@ const login = async (req, res) => {
 const logout = (req, res) => {
   res.cookie("token", "", {
     httpOnly: true,
-    secure: true,
-    sameSite: "Strict",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
     expires: new Date(0),
   });
 
