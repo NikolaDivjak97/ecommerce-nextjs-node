@@ -1,9 +1,24 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { getUserFromClient } from "@/utils/auth";
+import { getUserFromClient, getUser } from "@/utils/auth";
 import { useAuth } from "../context/authContext";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+export async function getServerSideProps(context) {
+  const user = await getUser(context);
+
+  if (user) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
+}
 
 export default function Register() {
   const [name, setName] = useState("");

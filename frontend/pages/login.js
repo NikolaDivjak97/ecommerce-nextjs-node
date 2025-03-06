@@ -1,9 +1,24 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { getUserFromClient } from "@/utils/auth";
+import { getUser, getUserFromClient } from "@/utils/auth";
 import { useAuth } from "../context/authContext";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+export async function getServerSideProps(context) {
+  const user = await getUser(context);
+
+  if (user) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
+}
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -34,13 +49,8 @@ export default function Login() {
 
       if (user) {
         setUser(user);
-
-        if (user.isAdmin) {
-          router.push("/dashboard");
-        }
+        router.push(user.isAdmin ? "/dashboard" : "/");
       }
-
-      router.push("/");
     } catch (err) {
       setError(err.message);
     }

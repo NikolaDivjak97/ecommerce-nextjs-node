@@ -8,8 +8,10 @@ export const getServerSideProps = withAdmin(CreateProductSideProps);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function CreateProductSideProps() {
-  const res = await fetch(`${API_URL}/api/categories/select`);
+export async function CreateProductSideProps({ req }) {
+  const res = await fetch(`${API_URL}/api/categories/select`, {
+    headers: { Cookie: req.headers.cookie || "" },
+  });
   const categories = await res.json();
 
   return {
@@ -129,7 +131,7 @@ export default function CreateProduct({ categories }) {
         </div>
 
         <div className="mb-5">
-          <label htmlFor="images" class="block text-sm font-medium text-gray-700">
+          <label htmlFor="images" className="block text-sm font-medium text-gray-700">
             Product images
           </label>
           <input id="images" type="file" multiple onChange={handleFileChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
@@ -143,18 +145,7 @@ export default function CreateProduct({ categories }) {
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: isSubmitting ? "#ccc" : "#0070f3",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
+        <button type="submit" disabled={isSubmitting} className="inline-flex items-center bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
           {isSubmitting ? "Submitting..." : "Create Product"}
         </button>
       </form>

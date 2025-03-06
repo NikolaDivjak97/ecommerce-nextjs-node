@@ -3,9 +3,9 @@ import { getUser } from "@/utils/auth";
 export function withAdmin(pageGetServerSideProps) {
   return async (context) => {
     const userData = await getUser(context);
-    const user = userData?.user;
+    const authUser = userData?.user;
 
-    if (!user || !user.isAdmin) {
+    if (!authUser || !authUser.isAdmin) {
       return {
         redirect: {
           destination: "/",
@@ -32,7 +32,7 @@ export function withAdmin(pageGetServerSideProps) {
 
     return {
       props: {
-        user,
+        authUser,
         ...props,
       },
     };

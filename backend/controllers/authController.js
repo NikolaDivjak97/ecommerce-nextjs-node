@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { User } = require("../models");
+const { User, Cart } = require("../models");
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
@@ -19,6 +19,9 @@ const register = async (req, res) => {
     if (userExists) return res.status(400).json({ message: "User already exists" });
 
     const user = await User.create({ name, email, password });
+
+    // associate cart with user, TODO: maybe move it to User model? later..
+    await Cart.create({ userId: user.id });
 
     const token = generateToken(user.id);
 
@@ -76,7 +79,10 @@ const logout = (req, res) => {
 
 const authenticate = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id, { attributes: ["id", "name", "isAdmin"] });
+    const user = await User.findByPk(req.user.id, {
+      attributes: ["id", "name", "isAdmin"],
+    });
+
     res.json({ user });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Image.beforeDestroy(async (image) => {
     const imagePath = path.join(process.cwd(), image.path);
-    console.log("PATH", imagePath);
+
     if (fs.existsSync(imagePath)) {
       fs.unlinkSync(imagePath);
     }
