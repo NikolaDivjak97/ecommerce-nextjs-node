@@ -2,8 +2,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/authContext";
 import { useState, useEffect } from "react";
-import { getUserFromClient } from "@/utils/auth";
 import { FaUser, FaShoppingCart, FaCaretDown } from "react-icons/fa";
+import Logo from "@/assets/logoipsum.svg";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -11,7 +11,6 @@ export default function Navbar({ cart }) {
   const router = useRouter();
 
   const { user, setUser } = useAuth();
-  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
@@ -45,7 +44,6 @@ export default function Navbar({ cart }) {
         const cartData = localStorage.getItem("cart");
 
         if (cartData) {
-          console.log(cartData);
           const cart = JSON.parse(cartData);
           setCartCount(cart.length);
         }
@@ -57,36 +55,25 @@ export default function Navbar({ cart }) {
 
   useEffect(() => {
     setIsAccountOpen(false);
-    setIsCategoriesOpen(false);
   }, [router.asPath]);
 
   return (
     <nav className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-lg font-semibold text-gray-800 hover:text-gray-600">
+            <Link href="/" className="text-lg mr-3 font-semibold text-gray-800 hover:text-gray-600">
               Home
             </Link>
-            <div className="ml-6 relative">
-              <button className="text-gray-800 hover:text-gray-600 flex items-center focus:outline-none" onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}>
-                Categories <FaCaretDown className="ml-1" />
-              </button>
-              {isCategoriesOpen && (
-                <div className="absolute z-10 left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2">
-                  <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
-                    Electronics
-                  </a>
-                  <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
-                    Clothing
-                  </a>
-                  <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
-                    Books
-                  </a>
-                </div>
-              )}
-            </div>
+
+            <Link href="/shop" className="text-lg font-semibold text-gray-800 hover:text-gray-600">
+              Shop
+            </Link>
           </div>
+
+          <Link href="/">
+            <Logo />
+          </Link>
 
           <div className="flex items-center space-x-6">
             {user ? (
