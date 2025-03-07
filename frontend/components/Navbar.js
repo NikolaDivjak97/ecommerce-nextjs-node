@@ -55,6 +55,11 @@ export default function Navbar({ cart }) {
     fetchUserCartCount();
   }, [user]);
 
+  useEffect(() => {
+    setIsAccountOpen(false);
+    setIsCategoriesOpen(false);
+  }, [router.asPath]);
+
   return (
     <nav className="bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -97,7 +102,7 @@ export default function Navbar({ cart }) {
                           Dashboard
                         </Link>
                       )}
-                      <Link href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                      <Link href="/account" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
                         Account
                       </Link>
                       <Link href="#" className="block px-4 py-2 text-gray-800 hover:bg-gray-100">

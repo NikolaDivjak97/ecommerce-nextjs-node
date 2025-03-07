@@ -88,6 +88,91 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const updateAccount = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(500).json({ error: "User not found!" });
+    }
+
+    const { name, email, address, phone } = req.body;
+
+    user.update({ name, email, address, phone });
+
+    res.status(201).json({ message: "Account updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const changePassword = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(500).json({ error: "User not found!" });
+    }
+
+    const { password, newPassword } = req.body;
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ errors: { password: "Wrong password." } });
+    }
+
+    if (password === newPassword) {
+      return res.status(401).json({ errors: { newPassword: "New password must be different from old." } });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    user.update({ password: hashed });
+
+    res.status(201).json({ message: "Password changed successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const deleteAccount = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(500).json({ error: "User not found!" });
+    }
+
+    const { password } = req.body;
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ errors: { deletePassword: "Wrong password." } });
+    }
+
+    res.cookie("token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      expires: new Date(0),
+    });
+
+    const deleted = await user.destroy();
+
+    if (!deleted) {
+      throw new Error("An error occurred.");
+    }
+
+    res.json({ success: true });
+
+    res.status(201).json({ message: "Password changed successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const table = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -111,4 +196,4 @@ const table = async (req, res) => {
   }
 };
 
-module.exports = { getUser, storeUser, updateUser, deleteUser, table };
+module.exports = { getUser, storeUser, updateUser, deleteUser, updateAccount, changePassword, deleteAccount, table };

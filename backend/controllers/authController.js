@@ -80,7 +80,7 @@ const logout = (req, res) => {
 const authenticate = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: ["id", "name", "isAdmin"],
+      attributes: ["id", "name", "email", "address", "phone", "isAdmin"],
     });
 
     res.json({ user });

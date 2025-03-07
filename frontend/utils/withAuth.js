@@ -2,7 +2,7 @@ import { getUser } from "@/utils/auth";
 
 export function withAuth(pageGetServerSideProps) {
   return async (context) => {
-    const user = await getUser(context.req);
+    const user = await getUser(context);
 
     if (!user) {
       return {
@@ -17,6 +17,13 @@ export function withAuth(pageGetServerSideProps) {
 
     if (pageGetServerSideProps) {
       const result = await pageGetServerSideProps(context);
+
+      if (result.redirect) {
+        return {
+          redirect: result.redirect,
+        };
+      }
+
       if (result.props) {
         props = result.props;
       }

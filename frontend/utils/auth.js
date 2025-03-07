@@ -1,15 +1,19 @@
 const cookie = require("cookie");
 
 export async function getUserFromClient() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-    credentials: "include",
-  });
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+      credentials: "include",
+    });
 
-  if (!res.ok) {
-    new Error("Not authenticated");
+    if (!res.ok) {
+      new Error("Not authenticated");
+    }
+
+    return await res.json();
+  } catch {
+    return null;
   }
-
-  return await res.json();
 }
 
 export async function getUser(context) {

@@ -20,7 +20,7 @@ export default function CreateCategory() {
     e.preventDefault();
 
     setIsSubmitting(true);
-    setErrors(null);
+    setErrors([]);
     setSuccess(false);
 
     try {

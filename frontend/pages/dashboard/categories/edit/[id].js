@@ -3,7 +3,8 @@ import DashboardLayout from "@/components/dashboard/Layout";
 import { withAdmin } from "@/utils/withAdmin";
 import { useRouter } from "next/router";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import { showSuccessMessage, showErrorMessage } from "@/utils/toastMessages";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -92,18 +93,6 @@ export default function EditCategory({ category }) {
     } catch (err) {
       showErrorMessage(err.message);
     }
-  };
-
-  const showSuccessMessage = (message) => {
-    toast.success(message, {
-      position: "top-right",
-    });
-  };
-
-  const showErrorMessage = (message) => {
-    toast.error(message, {
-      position: "top-right",
-    });
   };
 
   return (
