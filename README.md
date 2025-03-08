@@ -47,8 +47,3 @@ Basic E-commerce platform built with Next.js, Express, MySQL, and Sequelize, fol
    ```sh
    npm run dev
    ```
-
-## License
-
-[Specify the license if applicable]
-
