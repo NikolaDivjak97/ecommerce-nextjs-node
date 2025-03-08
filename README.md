@@ -1,6 +1,6 @@
 # Project Name
 
-A brief description of your project.
+Basic E-commerce platform built with Next.js, Express, MySQL, and Sequelize, following the MVC pattern.
 
 ## Backend Setup
 
