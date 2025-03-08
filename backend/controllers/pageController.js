@@ -1,4 +1,4 @@
-const { Product, Image } = require("../models");
+const { Product, Image, Category } = require("../models");
 
 const homePage = async (req, res) => {
   try {
@@ -16,7 +16,9 @@ const homePage = async (req, res) => {
       ],
     });
 
-    res.json({ products });
+    const categories = await Category.findAll({ attributes: { exclude: ["createdAt", "updatedAt"] } });
+
+    res.json({ products, categories });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

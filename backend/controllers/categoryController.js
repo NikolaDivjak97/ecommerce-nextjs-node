@@ -32,9 +32,11 @@ const getCategory = async (req, res) => {
 const storeCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
-    const slug = slugify(name, { lower: true, strict: true });
 
-    const category = await Category.create({ name, slug, description });
+    const slug = slugify(name, { lower: true, strict: true });
+    const icon = `/images/${req.files[0].filename}`;
+
+    await Category.create({ name, slug, description, icon });
 
     res.status(201).json({ message: "Category created successfully" });
   } catch (error) {
@@ -55,6 +57,10 @@ const updateCategory = async (req, res) => {
     const slug = slugify(name, { lower: true, strict: true });
 
     category.update({ name, slug, description });
+
+    if (req.files && req.files.length > 0) {
+      category.update({ icon: `/images/${req.files[0].filename}` });
+    }
 
     res.status(201).json({ message: "Category updated successfully" });
   } catch (error) {

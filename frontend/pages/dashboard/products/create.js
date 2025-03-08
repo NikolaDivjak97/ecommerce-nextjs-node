@@ -49,6 +49,7 @@ export default function CreateProduct({ categories }) {
 
     try {
       const formData = new FormData();
+
       formData.append("name", name);
       formData.append("description", description);
       formData.append("stock", stock);
@@ -134,7 +135,7 @@ export default function CreateProduct({ categories }) {
           <label htmlFor="images" className="block text-sm font-medium text-gray-700">
             Product images
           </label>
-          <input id="images" type="file" multiple onChange={handleFileChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+          <input id="images" type="file" accept="image/*" multiple onChange={handleFileChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
         </div>
 
         {previews && (
