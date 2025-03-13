@@ -27,6 +27,7 @@ export default function CreateProduct({ categories }) {
   const [stock, setStock] = useState(0);
   const [price, setPrice] = useState(0);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [mainImage, setMainImage] = useState([]);
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
 
@@ -34,7 +35,12 @@ export default function CreateProduct({ categories }) {
   const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState(false);
 
-  const handleFileChange = (e) => {
+  const mainImageChange = (e) => {
+    const mainImage = e.target.files?.[0] || null;
+    setMainImage(mainImage);
+  };
+
+  const imagesChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setImages(selectedFiles);
     setPreviews(selectedFiles.map((file) => URL.createObjectURL(file)));
@@ -58,6 +64,8 @@ export default function CreateProduct({ categories }) {
       selectedCategories.forEach((category) => {
         formData.append("categories", category.value);
       });
+
+      formData.append("main_image", mainImage);
 
       images.forEach((image) => {
         formData.append("images", image);
@@ -132,10 +140,18 @@ export default function CreateProduct({ categories }) {
         </div>
 
         <div className="mb-5">
+          <label htmlFor="main_image" className="block text-sm font-medium text-gray-700">
+            Main image
+          </label>
+          <input id="main_image" type="file" accept="image/*" onChange={mainImageChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+          {errors?.main_image && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.main_image}</p>}
+        </div>
+
+        <div className="mb-5">
           <label htmlFor="images" className="block text-sm font-medium text-gray-700">
             Product images
           </label>
-          <input id="images" type="file" accept="image/*" multiple onChange={handleFileChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+          <input id="images" type="file" accept="image/*" multiple onChange={imagesChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
         </div>
 
         {previews && (

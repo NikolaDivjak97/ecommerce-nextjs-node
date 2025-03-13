@@ -28,7 +28,7 @@ export default function Navbar({ cart }) {
   useEffect(() => {
     const fetchUserCartCount = async () => {
       if (user) {
-        const res = await fetch(`${API_URL}/api/cart/cart-count`, {
+        const res = await fetch(`${API_URL}/api/cart/count`, {
           credentials: "include",
         });
 
@@ -96,7 +96,7 @@ export default function Navbar({ cart }) {
                         My orders
                       </Link>
 
-                      <a onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                      <a onClick={handleLogout} className="cursor-pointer block px-4 py-2 text-gray-800 hover:bg-gray-100">
                         Logout
                       </a>
                     </div>

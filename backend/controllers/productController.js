@@ -14,12 +14,39 @@ const getProduct = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    res.status(500).json({ error: "Id parameter missing!" });
+    return res.status(500).json({ error: "Id parameter missing!" });
   }
 
   try {
     const product = await Product.findByPk(id);
     res.json(product);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch product" });
+  }
+};
+
+const getProductBySlug = async (req, res) => {
+  const { slug } = req.params;
+
+  try {
+    const product = await Product.findOne({
+      where: { slug },
+      include: [
+        {
+          model: Image,
+          as: "images",
+          attributes: ["id", "path"],
+        },
+        {
+          model: Category,
+          as: "Categories",
+          through: { attributes: [] },
+          attributes: ["id", "name"],
+        },
+      ],
+    });
+
+    res.json({ product });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch product" });
   }
@@ -66,12 +93,15 @@ const storeProduct = async (req, res) => {
     const { name, description, stock, price, categories } = req.body;
     const slug = slugify(name, { lower: true, strict: true });
 
-    const product = await Product.create({ name, slug, description, stock, price });
+    const mainImage = req.files.main_image[0];
+    const mainImagePath = `/images/${mainImage.filename}`;
+
+    const product = await Product.create({ name, slug, main_image: mainImagePath, description, stock, price });
 
     await product.setCategories(categories);
 
-    if (req.files && req.files.length > 0) {
-      const images = req.files.map((file) => ({
+    if (req.files.images) {
+      const images = req.files.images.map((file) => ({
         productId: product.id,
         name: file.filename,
         path: `/images/${file.filename}`,
@@ -99,6 +129,10 @@ const updateProduct = async (req, res) => {
     const slug = slugify(name, { lower: true, strict: true });
 
     product.update({ name, slug, description, stock, price });
+
+    if (req.file) {
+      product.update({ main_image: `/images/${req.file.filename}` });
+    }
 
     await product.setCategories(categories);
 
@@ -157,4 +191,4 @@ const table = async (req, res) => {
   }
 };
 
-module.exports = { getProducts, getProduct, editProduct, storeProduct, updateProduct, deleteProduct, table };
+module.exports = { getProducts, getProduct, getProductBySlug, editProduct, storeProduct, updateProduct, deleteProduct, table };

@@ -3,6 +3,7 @@ const path = require("path");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
+require("./cron/cronJobs");
 const routes = require("./routes/routes");
 
 const app = express();

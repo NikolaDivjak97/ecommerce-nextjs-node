@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       Product.belongsToMany(models.Cart, {
-        through: "cart_product",
+        through: models.CartProduct,
         foreignKey: "productId",
         otherKey: "cartId",
       });
@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
   Product.init(
     {
       slug: DataTypes.STRING,
+      main_image: DataTypes.STRING,
       name: DataTypes.STRING,
       price: DataTypes.FLOAT,
       description: DataTypes.TEXT,

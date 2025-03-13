@@ -3,9 +3,10 @@ import { useRouter } from "next/router";
 import DashboardLayout from "@/components/dashboard/Layout";
 import Select from "react-select";
 import { withAdmin } from "@/utils/withAdmin";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import { FiPlusCircle } from "react-icons/fi";
+import { showErrorMessage, showSuccessMessage } from "@/utils/toastMessages";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -29,7 +30,8 @@ export default function EditProduct({ product, categories }) {
   const [updatedProduct, setUpdatedProduct] = useState(null);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
-  const [error, setError] = useState(null);
+  const [mainImage, setMainImage] = useState([]);
+  const [errors, setErrors] = useState([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleImageClick = () => {
@@ -58,20 +60,37 @@ export default function EditProduct({ product, categories }) {
     const categories = selectedCategories.map((category) => category.value);
 
     try {
+      const formData = new FormData();
+
+      formData.append("name", updatedProduct.name);
+      formData.append("description", updatedProduct.description);
+      formData.append("stock", updatedProduct.stock);
+      formData.append("price", updatedProduct.price);
+
+      if (mainImage) {
+        formData.append("main_image", mainImage);
+      }
+
+      selectedCategories.forEach((category) => {
+        formData.append("categories", category.value);
+      });
+
       const res = await fetch(`${API_URL}/api/products/update/${id}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name: updatedProduct.name, description: updatedProduct.description, stock: updatedProduct.stock, price: updatedProduct.price, categories }),
+        body: formData,
       });
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message || "An error occurred.");
+      if (!res.ok) {
+        setErrors(data.errors);
+        throw new Error(data.message || "An error occurred.");
+      }
 
       showSuccessMessage("Product updated successfully.");
     } catch (err) {
-      setError(err.message);
+      showErrorMessage(err.message);
     }
   };
 
@@ -98,7 +117,7 @@ export default function EditProduct({ product, categories }) {
         query: { message: "Product deleted successfully." },
       });
     } catch (err) {
-      setError(err.message);
+      showErrorMessage(err.message);
     }
   };
 
@@ -122,13 +141,12 @@ export default function EditProduct({ product, categories }) {
       if (!response.ok) {
         throw new Error("Something went wrong.");
       }
-      console.log(data);
 
       setSelectedImages([...selectedImages, { id: data.id, path: data.path }]);
 
       showSuccessMessage("Image added successfully.");
     } catch (err) {
-      console.log(err.message);
+      showErrorMessage(err.message);
     }
   };
 
@@ -150,14 +168,13 @@ export default function EditProduct({ product, categories }) {
 
       showSuccessMessage("Image deleted successfully.");
     } catch (err) {
-      setError(err.message);
+      showErrorMessage(err.message);
     }
   };
 
-  const showSuccessMessage = (message) => {
-    toast.success(message, {
-      position: "top-right",
-    });
+  const mainImageChange = (e) => {
+    const mainImage = e.target.files?.[0] || null;
+    setMainImage(mainImage);
   };
 
   if (!updatedProduct) return <p>Product not found.</p>;
@@ -182,12 +199,13 @@ export default function EditProduct({ product, categories }) {
 
       <div className="mt-6">
         {activeTab === "info" && (
-          <form className="space-y-4">
+          <form onSubmit={updateProduct} className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Name
               </label>
               <input type="text" id="name" name="name" value={updatedProduct.name} onChange={(e) => setUpdatedProduct({ ...updatedProduct, name: e.target.value })} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              {errors?.name && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.name}</p>}
             </div>
 
             <div>
@@ -195,6 +213,7 @@ export default function EditProduct({ product, categories }) {
                 Description
               </label>
               <textarea id="description" name="description" value={updatedProduct.description} onChange={(e) => setUpdatedProduct({ ...updatedProduct, description: e.target.value })} rows="5" className="mt-1 block w-full resize-none px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              {errors?.description && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.description}</p>}
             </div>
 
             <div>
@@ -202,6 +221,7 @@ export default function EditProduct({ product, categories }) {
                 Price
               </label>
               <input type="number" id="price" name="price" value={updatedProduct.price} onChange={(e) => setUpdatedProduct({ ...updatedProduct, price: e.target.value })} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              {errors?.price && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.price}</p>}
             </div>
 
             <div>
@@ -209,6 +229,15 @@ export default function EditProduct({ product, categories }) {
                 Stock
               </label>
               <input type="number" id="stock" name="stock" value={updatedProduct.stock} onChange={(e) => setUpdatedProduct({ ...updatedProduct, stock: e.target.value })} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              {errors?.stock && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.stock}</p>}
+            </div>
+
+            <div className="mb-5">
+              <label htmlFor="main_image" className="block text-sm font-medium text-gray-700">
+                New Main image
+              </label>
+              <input id="main_image" type="file" accept="image/*" onChange={mainImageChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              {errors?.main_image && <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.main_image}</p>}
             </div>
 
             <div>
@@ -219,7 +248,7 @@ export default function EditProduct({ product, categories }) {
             </div>
 
             <div>
-              <button type="submit" onClick={(e) => updateProduct(e)} className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+              <button type="submit" className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 Save Changes
               </button>
             </div>
